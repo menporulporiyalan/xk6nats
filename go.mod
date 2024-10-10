@@ -1,4 +1,4 @@
-module github.com/ydarias/xk6-nats
+module github.com/menporiyaalan/xk6nats
 
 go 1.19
 
