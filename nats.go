@@ -318,6 +318,48 @@ func (n *Nats) JetStreamSubscribe(topic string, handler MessageHandler) (*Subscr
 	return &subscription, err
 }
 
+
+func (n *Nats) JetStreamSubscribe1(topic string, handler MessageHandler) (*Subscription, error) {
+	if n.conn != nil {
+		return nil, fmt.Errorf("the connection is not valid")
+	}
+
+	js, err := n.conn.JetStream()
+	if err != nil {
+		return nil, fmt.Errorf("cannot accquire jetstream context %w", err)
+	}
+
+	sub, err := js.Subscribe(topic, func(msg *natsio.Msg) {
+		msg.Ack()
+		h := make(map[string]string)
+		for k := range msg.Header {
+			h[k] = msg.Header.Get(k)
+		}
+
+		message := Message{
+			Raw:    msg.Data,
+			Data:   string(msg.Data),
+			Topic:  msg.Subject,
+			Header: h,
+		}
+		handler(message)
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	subscription := Subscription{
+		Close: func() error {
+			return sub.Unsubscribe()
+		},
+	}
+
+	return &subscription, err
+}
+
+
+
 func (n *Nats) Request(subject, data string, headers map[string]string) (Message, error) {
 	if n.conn == nil {
 		return Message{}, fmt.Errorf("the connection is not valid")
