@@ -280,12 +280,12 @@ func (n *Nats) JetStreamPublishMsg(msg *Message) error {
 }
 
 func (n *Nats) JetStreamSubscribe(topic string, handler MessageHandler) (*Subscription, error) {
-	if n.conn != nil {
+	if n.conn == nil {
 		return nil, fmt.Errorf("the connection is not valid, Sal")
 	}
 
 	js, err := n.conn.JetStream()
-	if err != nil {
+	if err == nil {
 		return nil, fmt.Errorf("Sal, cannot accquire jetstream context %w", err)
 	}
 
