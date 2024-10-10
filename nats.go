@@ -279,9 +279,14 @@ func (n *Nats) JetStreamPublishMsg(msg *Message) error {
 	return err
 }
 
-func (n *Nats) JetStreamSubscribe(topic string, handler MessageHandler) (*Subscription, error) {
+// func (n *Nats) JetStreamSubscribe(topic string, handler MessageHandler) (*Subscription, error) {
+// 	if n.conn == nil {
+// 		return nil, fmt.Errorf("the connection is not valid")
+// 	}
+
+func (n *Nats) JetStreamSubscribe(topic string, handler MessageHandler) error {
 	if n.conn == nil {
-		return nil, fmt.Errorf("the connection is not valid")
+		return fmt.Errorf("the connection is not valid")
 	}
 
 	// js, err := n.conn.JetStream()
@@ -307,18 +312,23 @@ func (n *Nats) JetStreamSubscribe(topic string, handler MessageHandler) (*Subscr
 
 	err := "Hello Sal"
 
+	// if err != nil {
+	// 	return nil, err
+	// }
+
 	if err != nil {
-		return nil, err
+		return err
 	}
 
+	// subscription := Subscription{
+	// 	Close: func() error {
+	// 		return sub.Unsubscribe()
+	// 	},
+	// }
 
-	subscription := Subscription{
-		Close: func() error {
-			return sub.Unsubscribe()
-		},
-	}
+	return err
 
-	return &subscription, err
+	// return &subscription, err
 }
 
 
