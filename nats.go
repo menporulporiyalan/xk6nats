@@ -284,7 +284,7 @@ func (n *Nats) JetStreamPublishMsg(msg *Message) error {
 // 		return nil, fmt.Errorf("the connection is not valid")
 // 	}
 
-func (n *Nats) JetStreamSubscribe(topic string) error {
+func (n *Nats) JetStreamSubscribe() error {
 //func (n *Nats) JetStreamSubscribe(topic string, handler MessageHandler) error {
 	// if n.conn == nil {
 	// 	return fmt.Errorf("the connection is not valid")
