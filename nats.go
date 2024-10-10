@@ -285,7 +285,7 @@ func (n *Nats) JetStreamSubscribe(topic string, handler MessageHandler) (*Subscr
 	}
 
 	js, err := n.conn.JetStream()
-	if err == nil {
+	if err != nil {
 		return nil, fmt.Errorf("Sal, cannot accquire jetstream context %w", err)
 	}
 
@@ -306,7 +306,7 @@ func (n *Nats) JetStreamSubscribe(topic string, handler MessageHandler) (*Subscr
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Sal, This is where the error is %w", err)
 	}
 
 	subscription := Subscription{
