@@ -134,10 +134,12 @@ func (n *Nats) Asyncsubscribe(topic string, handler MessageHandler) (*Subscripti
 			h[k] = msg.Header.Get(k)
 		}
 
-		message := {msg.Subject}
-		// message := Message{
-		// 	Topic:  msg.Subject,
-		// }
+		message := Message{
+			Raw:    msg.Data,
+			Data:   string(msg.Data),
+			Topic:  msg.Subject,
+			Header: h,
+		}
 		handler(message)
 	})
 
@@ -161,7 +163,10 @@ type Configuration struct {
 }
 
 type Message struct {
+	Raw    []byte
+	Data   string
 	Topic  string
+	Header map[string]string
 }
 
 type Subscription struct {
