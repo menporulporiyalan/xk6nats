@@ -90,97 +90,11 @@ func (n *Nats) Close() {
 	}
 }
 
-func (n *Nats) PublishWithHeaders(topic, message string, headers map[string]string) error {
-	if n.conn == nil {
-		return fmt.Errorf("the connection is not valid")
-	}
 
-	h := natsio.Header{}
-	for k, v := range headers {
-		h.Add(k, v)
-	}
-
-	return n.conn.PublishMsg(&natsio.Msg{
-		Subject: topic,
-		Reply:   "",
-		Data:    []byte(message),
-		Header:  h,
-	})
-}
-
-func (n *Nats) PublishMsg(msg *Message) error {
-	if n.conn == nil {
-		return fmt.Errorf("the connection is not valid")
-	}
-
-	raw := msg.Raw
-	if raw == nil {
-		raw = []byte(msg.Data)
-	}
-
-	h := natsio.Header{}
-	for k, v := range msg.Header {
-		h.Add(k, v)
-	}
-
-	return n.conn.PublishMsg(&natsio.Msg{
-		Subject: msg.Topic,
-		Reply:   "",
-		Data:    raw,
-		Header:  h,
-	})
-}
-
-func (n *Nats) Publish(topic, message string) error {
-	if n.conn == nil {
-		return fmt.Errorf("the connection is not valid")
-	}
-
-	return n.conn.Publish(topic, []byte(message))
-}
-
-// func (n *Nats) Subscribe(topic string, handler MessageHandler) (*Subscription, error) {
-// 	if n.conn == nil {
-// 		return nil, fmt.Errorf("the connection is not valid")
-// 	}
-
-// 	sub, err := n.conn.Subscribe(topic, func(msg *natsio.Msg) {
-// 		msg.Ack()
-// 		h := make(map[string]string)
-// 		for k := range msg.Header {
-// 			h[k] = msg.Header.Get(k)
-// 		}
-
-// 		message := Message{
-// 			Raw:    msg.Data,
-// 			Data:   string(msg.Data),
-// 			Topic:  msg.Subject,
-// 			Header: h,
-// 		}
-// 		handler(message)
-// 	})
-
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	subscription := Subscription{
-// 		Close: func() error {
-// 			return sub.Unsubscribe()
-// 		},
-// 	}
-
-// 	return &subscription, err
-// }
-
-
-func (n *Nats) Asyncsubscribe(topic string, handler MessageHandler) (*Subscription, error) {
+func (n *Nats) Subscribe(topic string, handler MessageHandler) (*Subscription, error) {
 	if n.conn == nil {
 		return nil, fmt.Errorf("the connection is not valid")
 	}
-
-	wg := sync.WaitGroup{}
-	wg.Add(1)
 
 	sub, err := n.conn.Subscribe(topic, func(msg *natsio.Msg) {
 		msg.Ack()
@@ -190,14 +104,9 @@ func (n *Nats) Asyncsubscribe(topic string, handler MessageHandler) (*Subscripti
 		}
 
 		message := Message{
-			Raw:    msg.Data,
-			Data:   string(msg.Data),
 			Topic:  msg.Subject,
-			Header: h,
 		}
 		handler(message)
-
-		wg.Done()
 	})
 
 	if err != nil {
@@ -213,163 +122,16 @@ func (n *Nats) Asyncsubscribe(topic string, handler MessageHandler) (*Subscripti
 	return &subscription, err
 }
 
-// Connects to JetStream and creates a new stream or updates it if exists already
-func (n *Nats) JetStreamSetup(streamConfig *natsio.StreamConfig) error {
-	if n.conn == nil {
-		return fmt.Errorf("the connection is not valid")
-	}
 
-	js, err := n.conn.JetStream()
-	if err != nil {
-		return fmt.Errorf("cannot accquire jetstream context %w", err)
-	}
-
-	stream, _ := js.StreamInfo(streamConfig.Name)
-	if stream == nil {
-		_, err = js.AddStream(streamConfig)
-	} else {
-		_, err = js.UpdateStream(streamConfig)
-	}
-
-	return err
-}
-
-func (n *Nats) JetStreamDelete(name string) error {
-	if n.conn == nil {
-		return fmt.Errorf("the connection is not valid")
-	}
-
-	js, err := n.conn.JetStream()
-	if err != nil {
-		return fmt.Errorf("cannot accquire jetstream context %w", err)
-	}
-
-	js.DeleteStream(name)
-
-	return err
-}
-
-func (n *Nats) JetStreamPublish(topic string, message string) error {
-	if n.conn == nil {
-		return fmt.Errorf("the connection is not valid")
-	}
-
-	js, err := n.conn.JetStream()
-	if err != nil {
-		return fmt.Errorf("cannot accquire jetstream context %w", err)
-	}
-
-	_, err = js.Publish(topic, []byte(message))
-
-	return err
-}
-
-func (n *Nats) JetStreamPublishWithHeaders(topic, message string, headers map[string]string) error {
-	if n.conn == nil {
-		return fmt.Errorf("the connection is not valid")
-	}
-
-	h := natsio.Header{}
-	for k, v := range headers {
-		h.Add(k, v)
-	}
-
-	js, err := n.conn.JetStream()
-	if err != nil {
-		return fmt.Errorf("cannot accquire jetstream context %w", err)
-	}
-
-	_, err = js.PublishMsg(&natsio.Msg{
-		Subject: topic,
-		Reply:   "",
-		Data:    []byte(message),
-		Header:  h,
-	})
-
-	return err
-}
-
-func (n *Nats) JetStreamPublishMsg(msg *Message) error {
-	if n.conn == nil {
-		return fmt.Errorf("the connection is not valid")
-	}
-
-	raw := msg.Raw
-	if raw == nil {
-		raw = []byte(msg.Data)
-	}
-
-	h := natsio.Header{}
-	for k, v := range msg.Header {
-		h.Add(k, v)
-	}
-
-	js, err := n.conn.JetStream()
-	if err != nil {
-		return fmt.Errorf("cannot accquire jetstream context %w", err)
-	}
-
-	_, err = js.PublishMsg(&natsio.Msg{
-		Subject: msg.Topic,
-		Reply:   "",
-		Data:    raw,
-		Header:  h,
-	})
-
-	return err
-}
-
-func (n *Nats) JetStreamSubscribe(topic string, handler MessageHandler) (*Subscription, error) {
-	if n.conn == nil {
-		return nil, fmt.Errorf("the connection is not valid, Sal")
-	}
-
-	js, err := n.conn.JetStream()
-	if err != nil {
-		return nil, fmt.Errorf("Sal, cannot accquire jetstream context %w", err)
-	}
-
-	sub, err := js.Subscribe(topic, func(msg *natsio.Msg) {
-		msg.Ack()
-		h := make(map[string]string)
-		for k := range msg.Header {
-			h[k] = msg.Header.Get(k)
-		}
-
-		message := Message{
-			Raw:    msg.Data,
-			Data:   string(msg.Data),
-			Topic:  msg.Subject,
-			Header: h,
-		}
-		handler(message)
-	})
-
-	if err != nil {
-		return nil, fmt.Errorf("Sal, This is where the error is %w", err)
-	}
-
-	subscription := Subscription{
-		Close: func() error {
-			return sub.Unsubscribe()
-		},
-	}
-
-	return &subscription, err
-}
-
-
-// func (n *Nats) JetStreamSubscribe(topic string, handler MessageHandler) (*Subscription, error) {
-// 	if n.conn != nil {
+// func (n *Nats) Asyncsubscribe(topic string, handler MessageHandler) (*Subscription, error) {
+// 	if n.conn == nil {
 // 		return nil, fmt.Errorf("the connection is not valid")
 // 	}
 
-// 	js, err := n.conn.JetStream()
-// 	if err != nil {
-// 		return nil, fmt.Errorf("cannot accquire jetstream context %w", err)
-// 	}
+// 	wg := sync.WaitGroup{}
+// 	wg.Add(1)
 
-// 	sub, err := js.Subscribe(topic, func(msg *natsio.Msg) {
+// 	sub, err := n.conn.Subscribe(topic, func(msg *natsio.Msg) {
 // 		msg.Ack()
 // 		h := make(map[string]string)
 // 		for k := range msg.Header {
@@ -383,6 +145,8 @@ func (n *Nats) JetStreamSubscribe(topic string, handler MessageHandler) (*Subscr
 // 			Header: h,
 // 		}
 // 		handler(message)
+
+// 		wg.Done()
 // 	})
 
 // 	if err != nil {
@@ -398,32 +162,6 @@ func (n *Nats) JetStreamSubscribe(topic string, handler MessageHandler) (*Subscr
 // 	return &subscription, err
 // }
 
-
-
-func (n *Nats) Request(subject, data string, headers map[string]string) (Message, error) {
-	if n.conn == nil {
-		return Message{}, fmt.Errorf("the connection is not valid")
-	}
-
-	msg, err := n.conn.Request(subject, []byte(data), 5*time.Second)
-	if err != nil {
-		return Message{}, err
-	}
-
-	if len(headers) > 0 {
-		for k, v := range headers {
-			msg.Header.Add(k, v)
-		}
-	}
-
-	return Message{
-		Raw:    msg.Data,
-		Data:   string(msg.Data),
-		Topic:  msg.Subject,
-		Header: headers,
-	}, nil
-}
-
 type Configuration struct {
 	Servers []string
 	Unsafe  bool
@@ -431,10 +169,7 @@ type Configuration struct {
 }
 
 type Message struct {
-	Raw    []byte
-	Data   string
 	Topic  string
-	Header map[string]string
 }
 
 type Subscription struct {
