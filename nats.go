@@ -127,8 +127,6 @@ func (n *Nats) Asyncsubscribe(topic string, handler MessageHandler) (*Subscripti
 		return nil, fmt.Errorf("the connection is not valid")
 	}
 
-	wg := sync.WaitGroup{}
-	wg.Add(1)
 	sub, err := n.conn.Subscribe(topic, func(msg *natsio.Msg) {
 		msg.Ack()
 		h := make(map[string]string)
