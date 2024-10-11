@@ -3,7 +3,6 @@ package nats
 import (
 	"crypto/tls"
 	"fmt"
-	"time"
 
 	"github.com/dop251/goja"
 	natsio "github.com/nats-io/nats.go"
