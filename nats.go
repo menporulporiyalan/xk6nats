@@ -120,38 +120,36 @@ func (n *Nats) Subscribe(topic string, handler MessageHandler) (*Subscription, e
 	return &subscription, err
 }
 
+// func (n *Nats) Asyncsubscribe(topic string, handler MessageHandler) (*Subscription, error) {
+// 	if n.conn == nil {
+// 		return nil, fmt.Errorf("the connection is not valid")
+// 	}
 
+// 	sub, err := n.conn.Subscribe(topic, func(msg *natsio.Msg) {
+// 		msg.Ack()
+// 		h := make(map[string]string)
+// 		for k := range msg.Header {
+// 			h[k] = msg.Header.Get(k)
+// 		}
 
-func (n *Nats) Asyncsubscribe(topic string, handler MessageHandler) (*Subscription, error) {
-	if n.conn == nil {
-		return nil, fmt.Errorf("the connection is not valid")
-	}
+// 		message := Message{
+// 			Topic:  msg.Subject,
+// 		}
+// 		handler(message)
+// 	})
 
-	sub, err := n.conn.Subscribe(topic, func(msg *natsio.Msg) {
-		msg.Ack()
-		h := make(map[string]string)
-		for k := range msg.Header {
-			h[k] = msg.Header.Get(k)
-		}
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-		message := Message{
-			Topic:  msg.Subject,
-		}
-		handler(message)
-	})
+// 	subscription := Subscription{
+// 		Close: func() error {
+// 			return sub.Unsubscribe()
+// 		},
+// 	}
 
-	if err != nil {
-		return nil, err
-	}
-
-	subscription := Subscription{
-		Close: func() error {
-			return sub.Unsubscribe()
-		},
-	}
-
-	return &subscription, err
-}
+// 	return &subscription, err
+// }
 
 type Configuration struct {
 	Servers []string
