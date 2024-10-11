@@ -173,6 +173,46 @@ func (n *Nats) Subscribe(topic string, handler MessageHandler) (*Subscription, e
 	return &subscription, err
 }
 
+
+func (n *Nats) Asyncsubscribe(topic string, handler MessageHandler) (*Subscription, error) {
+	if n.conn == nil {
+		return nil, fmt.Errorf("the connection is not valid")
+	}
+
+	wg := sync.WaitGroup{}
+	wg.Add(1)
+
+	sub, err := n.conn.Subscribe(topic, func(msg *natsio.Msg) {
+		msg.Ack()
+		h := make(map[string]string)
+		for k := range msg.Header {
+			h[k] = msg.Header.Get(k)
+		}
+
+		message := Message{
+			Raw:    msg.Data,
+			Data:   string(msg.Data),
+			Topic:  msg.Subject,
+			Header: h,
+		}
+		handler(message)
+
+		wg.Done()
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	subscription := Subscription{
+		Close: func() error {
+			return sub.Unsubscribe()
+		},
+	}
+
+	return &subscription, err
+}
+
 // Connects to JetStream and creates a new stream or updates it if exists already
 func (n *Nats) JetStreamSetup(streamConfig *natsio.StreamConfig) error {
 	if n.conn == nil {
