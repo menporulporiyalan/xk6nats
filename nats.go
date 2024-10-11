@@ -135,10 +135,11 @@ func (n *Nats) Asyncsubscribe(topic string, handler MessageHandler) (*Subscripti
 		for k := range msg.Header {
 			h[k] = msg.Header.Get(k)
 		}
-		wg.Done()
-		message := Message{
-			Topic:  msg.Subject,
-		}
+
+		message := msg.Subject
+		// message := Message{
+		// 	Topic:  msg.Subject,
+		// }
 		handler(message)
 	})
 
