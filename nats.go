@@ -102,6 +102,7 @@ func (n *Nats) Subscribe(topic string, handler MessageHandler) (*Subscription, e
 		}
 
 		message := Message{
+			Data:   string(msg.Data),
 			Topic:  msg.Subject,
 		}
 		handler(message)
@@ -158,6 +159,7 @@ type Configuration struct {
 }
 
 type Message struct {
+	Data   string
 	Topic  string
 }
 
