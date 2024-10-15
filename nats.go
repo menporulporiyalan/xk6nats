@@ -97,10 +97,10 @@ func (n *Nats) Subscribe(topic string, handler MessageHandler) (*Subscription, e
 
 	sub, err := n.conn.Subscribe(topic, func(msg *natsio.Msg) {
 		msg.Ack()
-		h := make(map[string]string)
-		for k := range msg.Header {
-			h[k] = msg.Header.Get(k)
-		}
+		// h := make(map[string]string)
+		// for k := range msg.Header {
+		// 	h[k] = msg.Header.Get(k)
+		// }
 
 		message := Message{
 //			Raw:    msg.Data,
