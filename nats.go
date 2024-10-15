@@ -3,7 +3,7 @@ package nats
 import (
 	"crypto/tls"
 	"fmt"
-	"encoding/json"
+//	"encoding/json"
 	"github.com/dop251/goja"
 	natsio "github.com/nats-io/nats.go"
 	"go.k6.io/k6/js/common"
