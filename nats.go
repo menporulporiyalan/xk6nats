@@ -102,7 +102,7 @@ func (n *Nats) Subscribe(topic string, handler MessageHandler) (*Subscription, e
 			h[k] = msg.Header.Get(k)
 		}
 
-		message := []Message{
+		message := Message{
 //			Raw:    msg.Data,
 			Data:   json.Marshal(msg.Data),
 			Topic:  msg.Subject,
