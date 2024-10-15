@@ -131,12 +131,12 @@ type Configuration struct {
 	Token   string
 }
 
-//type Message struct {
+type Message struct {
 //	Raw    []byte
-//	Data   string
-//	Topic  string
+	Data   string
+	Topic  string
 //	Header map[string]string
-//}
+}
 
 type Subscription struct {
 	Close func() error
