@@ -103,8 +103,8 @@ func (n *Nats) Subscribe(topic string, handler MessageHandler) (*Subscription, e
 		}
 
 		message := Message{
-//			Raw:    msg.Data,
-//			Data:   string(msg.Data[:]),
+			Raw:    msg.Data,
+			Data:   string(msg.Data[:]),
 			Topic:  msg.Subject,
 //			Header: h,
 		}
@@ -133,8 +133,8 @@ type Configuration struct {
 }
 
 type Message struct {
-//	Raw    []byte
-//	Data   string
+	Raw    []byte
+	Data   string
 	Topic  string
 //	Header map[string]string
 }
