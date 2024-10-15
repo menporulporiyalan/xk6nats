@@ -104,7 +104,7 @@ func (n *Nats) Subscribe(topic string, handler MessageHandler) (*Subscription, e
 
 		message := Message{
 //			Raw:    msg.Data,
-			Data:   string(msg.Data),
+			Data:   string(msg.Data[:]),
 			Topic:  msg.Subject,
 //			Header: h,
 		}
