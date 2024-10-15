@@ -108,8 +108,8 @@ func (n *Nats) Subscribe(topic string, handler MessageHandler) (*Subscription, e
 			Topic:  msg.Subject,
 //			Header: h,
 		}
-		b, err := json.Marshal(message)
-		handler(b)
+//		b, err := json.Marshal(message)
+		handler(message)
 	})
 
 	if err != nil {
