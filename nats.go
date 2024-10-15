@@ -3,7 +3,7 @@ package nats
 import (
 	"crypto/tls"
 	"fmt"
-
+	"encoding/json"
 	"github.com/dop251/goja"
 	natsio "github.com/nats-io/nats.go"
 	"go.k6.io/k6/js/common"
@@ -102,9 +102,9 @@ func (n *Nats) Subscribe(topic string, handler MessageHandler) (*Subscription, e
 			h[k] = msg.Header.Get(k)
 		}
 
-		message := Message{
+		message := []Message{
 //			Raw:    msg.Data,
-			Data:   string(msg.Data),
+			Data:   json.Marshal(msg.Data),
 			Topic:  msg.Subject,
 //			Header: h,
 		}
@@ -131,12 +131,12 @@ type Configuration struct {
 	Token   string
 }
 
-type Message struct {
+//type Message struct {
 //	Raw    []byte
-	Data   string
-	Topic  string
+//	Data   string
+//	Topic  string
 //	Header map[string]string
-}
+//}
 
 type Subscription struct {
 	Close func() error
