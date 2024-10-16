@@ -105,7 +105,7 @@ func (n *Nats) Subscribe(topic string, handler MessageHandler) (*Subscription, e
 		message := Message{
 //			Raw:    msg.Data,
 			Data:   msg,
-			Topic:  msg.Subject,
+//			Topic:  msg.Subject,
 //			Header: h,
 		}
 //		b, err := json.Marshal(message)
@@ -135,7 +135,7 @@ type Configuration struct {
 type Message struct {
 //	Raw    []byte
 	Data   *natsio.Msg
-	Topic  string
+//	Topic  string
 //	Header map[string]string
 }
 
