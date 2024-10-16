@@ -103,7 +103,7 @@ func (n *Nats) Subscribe(topic string, handler MessageHandler) (*Subscription, e
 		// }
 
 		message := Message{
-			Msg: String(msg.Ack()),
+			Msg: string(msg.Ack()),
 //			Raw:    msg.Data,
 //			Data:   msg.Subject,
 //			Topic:  msg.Subject,
