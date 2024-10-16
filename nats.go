@@ -145,4 +145,5 @@ type Subscription struct {
 	Close func() error
 }
 
-type MessageHandler func(Message)
+type MessageHandler func()
+//type MessageHandler func(Message)
