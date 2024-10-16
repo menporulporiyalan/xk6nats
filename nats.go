@@ -3,7 +3,7 @@ package nats
 import (
 	"crypto/tls"
 	"fmt"
-	"reflect"
+//	"reflect"
 	"github.com/dop251/goja"
 	natsio "github.com/nats-io/nats.go"
 	"go.k6.io/k6/js/common"
@@ -104,7 +104,7 @@ func (n *Nats) Subscribe(topic string, handler MessageHandler) (*Subscription, e
 
 		message := Message{
 //			Raw:    msg.Data,
-			Data:   string(msg),
+			Data:   msg,
 			Topic:  msg.Subject,
 //			Header: h,
 		}
@@ -134,7 +134,7 @@ type Configuration struct {
 
 type Message struct {
 //	Raw    []byte
-	Data   string
+	Data   *natsio.Msg
 	Topic  string
 //	Header map[string]string
 }
