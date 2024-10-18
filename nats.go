@@ -129,21 +129,23 @@ func (n *Nats) SubscribeAll(topic string, handler MessageHandler) (*Subscription
 	if n.conn == nil {
 		return nil, fmt.Errorf("the connection is not valid")
 	}
-	sum := 0
-	sub, err := n.conn.Subscribe(topic, func(msg *natsio.Msg) for i:= 0; i<10 ; i ++ {
 
+	sum:=0
+	for i:=0;i<10;i++{
+
+	sub, err := n.conn.Subscribe(topic, func(msg *natsio.Msg) {
 		msg.Ack()
 		message := Message{
 			Data:   msg,
 		}
 		handler(message)
-		sum +=i
 	})
 
 	if err != nil {
 		return nil, err
 	}
-
+	sum += i
+}
 	subscription := Subscription{
 		Close: func() error {
 			return sub.Unsubscribe()
