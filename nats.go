@@ -125,6 +125,33 @@ func (n *Nats) Subscribe(topic string, handler MessageHandler) (*Subscription, e
 	return &subscription, err
 }
 
+func (n *Nats) SubscribeAll(topic string, handler MessageHandler) (*Subscription, error) {
+	if n.conn == nil {
+		return nil, fmt.Errorf("the connection is not valid")
+	}
+	sum := 0
+	sub, err := n.conn.Subscribe(topic, func(msg *natsio.Msg) for i:= 0; i<10 ; i ++ {
+
+		msg.Ack()
+		message := Message{
+			Data:   msg,
+		}
+		handler(message)
+		sum +=i
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	subscription := Subscription{
+		Close: func() error {
+			return sub.Unsubscribe()
+		},
+	}
+
+	return &subscription, err
+}
 
 type Configuration struct {
 	Servers []string
