@@ -133,16 +133,12 @@ func (n *Nats) SubscribeAll(topic string, handler MessageHandler) (*Subscription
 	sum:=0
 
 
-	sub, err := n.conn.Subscribe(topic, func(msg *natsio.Msg) {
-		for i:=0;i<10;i++{
-		sum += i
-		msg.Ack()
-		message := Message{
-			Data:   msg,
-		}
-		handler(message)
+	sub, err := n.conn.SubscribeSync(topic)
+		// for i:=0;i<10;i++{
+		// sum += i
+		m, err := sub.NextMsg(timeout)
+	// }
 	}
-	})
 
 	if err != nil {
 		return nil, err
