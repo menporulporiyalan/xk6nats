@@ -131,21 +131,28 @@ func (n *Nats) SubscribeAll(topic string, handler MessageHandler) (*Subscription
 	}
 
 	sum:=0
-	for i:=0;i<10;i++{
+
 
 	sub, err := n.conn.Subscribe(topic, func(msg *natsio.Msg) {
+
+		for i:=0;i<10;i++
+		{
+	
+		sum += i
+		
+
 		msg.Ack()
 		message := Message{
 			Data:   msg,
 		}
 		handler(message)
+	}
 	})
 
 	if err != nil {
 		return nil, err
 	}
-	sum += i
-}
+
 	subscription := Subscription{
 		Close: func() error {
 			return sub.Unsubscribe()
